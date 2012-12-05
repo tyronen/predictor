@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style type="text/css">
+body {
+  font-family: "Arial";
+  margin: 0 20%;
+}
+
+.disclaimer {
+  font-size: x-small;
+}
+
+.party {
+  text-align: right;
+}
+
+.percent {
+  text-align: left;
+}
+
+.bar {
+  float: left;
+  margin-right: 5px;
+}
+
+#results {
+  display: none;
+}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.js"></script>
+<script src="jquery.tablesorter.js"></script>
+<script>
+
+var LIB = 0;
+var PC = 1;
+var NDP = 2;
+var GRN = 3;
+var OTH = 4;
+
+function oldriding(name, region, lib, pc, ndp, grn, oth) {
+  // these numbers are partisan offsets from 2011
+  this.name = name; // string
+  this.region = region;
+  this.data = new Array();
+  this.data[LIB] = lib;
+  this.data[PC] = pc;
+  this.data[NDP] = ndp;
+  this.data[GRN] = grn;
+  this.data[OTH] = oth;
+  this.winner = this.data.indexOf(Math.max.apply(Math, this.data));
+}
+
+var results = Array(
+  new oldriding("Ajax-Pickering","Suburbs",47.336906658940556,35.535274518325366,14.370563523105895,2.035346950601188,0.721908349026993),
+  new oldriding("Algoma-Manitoulin","North",28.423762680602522,23.597448509068553,44.51660006148171,2.628343067937289,0.833845680909929),
+  new oldriding("Ancaster-Dundas-Flamborough-Westdale","Ham-Niag",43.695375734210685,34.580061764527784,17.199200694346324,2.981248612316573,1.544113194598632),
+  new oldriding("Barrie","Central",34.80862908837857,40.65646021804686,18.953839016469498,4.428206912549292,1.152864764555788),
+  new oldriding("Beaches-East York","Toronto",36.07940446650124,13.92973749510252,46.8199033564059,2.677288755387227,0.493665926603108),
+  new oldriding("Bramalea-Gore-Malton","Suburbs",32.93169925640319,22.711833287432295,38.15753236023134,2.503901588175893,3.695033507757275),
+  new oldriding("Brampton-Springdale","Suburbs",44.42522052358397,36.174376719516694,15.253708483421732,2.552684573276229,1.594009700201378),
+  new oldriding("Brampton West","Suburbs",43.7605281129069,32.8568176644662,18.964261324834965,3.259731390849078,1.158661506942864),
+  new oldriding("Brant","Southwest",37.08336997625538,34.65174566880661,24.19752000703544,2.104036584293378,1.963327763609181),
+  new oldriding("Bruce-Grey-Owen Sound","Central",26.361787633757807,47.37084200842492,14.84772188059846,6.425216675543504,4.994431801675302),
+  new oldriding("Burlington","Ham-Niag",36.07485295302554,40.40971718636693,18.87438562565466,2.274192248811538,2.366851986141326),
+  new oldriding("Cambridge","Southwest",33.07255967856299,37.69085322618766,24.613566532734577,2.495863861971165,2.127156700543606),
+  new oldriding("Carleton-Mississippi Hills","East",34.0840707176812,50.28931579041074,11.34295938896505,3.306211832570726,0.977442270372283),
+  new oldriding("Chatham-Kent-Essex","Southwest",32.13516052384373,41.777642703210475,23.249709896667955,2.837486876277836,0),
+  new oldriding("Davenport","Toronto",41.4111704338374,7.928642220019822,45.93177531250999,2.733463346014898,1.994948687617891),
+  new oldriding("Don Valley East","Toronto",51.07778819119025,27.194626679162763,18.59731333958138,2.193064667291472,0.937207122774133),
+  new oldriding("Don Valley West","Toronto",58.31524202590834,30.600949495431447,8.638499892644989,1.712908843667247,0.732399742347973),
+  new oldriding("Dufferin-Caledon","Central",26.752665525865474,46.947479268132156,11.056996182703699,14.584704488613927,0.658154534684744),
+  new oldriding("Durham","Central",29.352852227652253,49.07409436567246,17.591111305910456,2.675812495890952,1.30612960487388),
+  new oldriding("Eglinton-Lawrence","Toronto",54.148836238388476,33.54816824966079,9.818912430852729,1.500365306335456,0.983717774762551),
+  new oldriding("Elgin-Middlesex-London","Southwest",26.808840260463313,47.85892377332914,22.272518215487402,2.37467018469657,0.685047566023577),
+  new oldriding("Essex","Southwest",25.124334700287932,35.007852717912925,37.99188552482332,1.875927056975831,0),
+  new oldriding("Etobicoke Centre","Toronto",51.48347388945007,32.78442058775165,11.978200098663347,1.966219549437384,1.78768587469755),
+  new oldriding("Etobicoke-Lakeshore","Toronto",51.02421285214509,29.24185232922114,15.45065365494384,2.679064628981771,1.604216534708157),
+  new oldriding("Etobicoke North","Toronto",48.45774337170591,24.355220408326982,21.764068829970718,2.169989170109502,3.252978219886888),
+  new oldriding("Glengarry-Prescott-Russell","East",43.176839589764015,39.761525440605396,14.241262570944937,1.916757940854326,0.903614457831325),
+  new oldriding("Guelph","Southwest",42.43313274942716,25.599074887037713,23.877336873889114,6.925498426023085,1.164957063622931),
+  new oldriding("Haldimand-Norfolk","Southwest",17.098533101717816,60.80631152287203,19.417100945763366,2.09419031075082,0.583864118895966),
+  new oldriding("Haliburton-Kawartha Lakes-Brock","Central",33.58266596203098,45.43274116834018,17.311679336558395,3.174925809992276,0.497987723078174),
+  new oldriding("Halton","Ham-Niag",39.131245655380546,44.468557671114425,13.151692918058357,2.1803631677998,1.068140587646869),
+  new oldriding("Hamilton Centre","Ham-Niag",17.460601185688326,13.1706735782167,61.328090088479755,3.720916376202818,4.319718771412399),
+  new oldriding("Hamilton East-Stoney Creek","Ham-Niag",26.30353935284742,18.708730741012474,51.71654818225517,1.750702051762087,1.520479672122853),
+  new oldriding("Hamilton Mountain","Ham-Niag",32.38489850792321,19.044365591871816,45.16342318118705,1.648557512176845,1.758755206841073),
+  new oldriding("Huron-Bruce","Southwest",32.754614112705006,42.762658086428026,20.84506412834607,1.724985476158556,1.912678196362336),
+  new oldriding("Kenora-Rainy River","North",9.979605710401088,37.64785859959211,49.62157262633129,1.772037162927714,0.978925900747791),
+  new oldriding("Kingston and Islands","East",48.844393858446956,22.322361849898957,23.788065317878797,3.702585305800098,1.342593667975192),
+  new oldriding("Kitchener Centre","Southwest",39.227279677863294,38.4040980681992,18.821040827769,2.390539782863551,1.15704164330496),
+  new oldriding("Kitchener-Conestoga","Southwest",35.49866352779617,44.18205448883003,17.570318055862085,2.74896392751171,0),
+  new oldriding("Kitchener-Waterloo","Southwest",36.035071415584156,43.76856098102992,16.66700337380553,2.642477625810622,0.886886603769773),
+  new oldriding("Lambton-Kent-Middlesex","Southwest",29.318889832908525,45.73539129613896,20.961956008684982,2.329368450863778,1.654394411403757),
+  new oldriding("Lanark-Frontenac-Lennox and Addington","East",27.876353085593127,50.1216382100212,18.087267046088606,3.914741658297065,0),
+  new oldriding("Leeds-Grenville","East",17.42917680295064,63.600931230217896,15.229276203928954,3.450260273614272,0.290355489288237),
+  new oldriding("London-Fanshawe","Southwest",28.277574872169467,26.51570489408327,40.76844411979547,2.489408327246165,1.948867786705624),
+  new oldriding("London North Centre","Southwest",43.908641070283146,28.928800513149454,22.711445065518188,3.324017227160268,1.12709612388894),
+  new oldriding("London West","Southwest",45.65371024734982,29.486118122160526,21.720343260979302,2.41090358404846,0.728924785461888),
+  new oldriding("Markham-Unionville","",52.579423691489644,31.474071488036092,12.286166984450949,2.964793082149475,0.695544753873835),
+  new oldriding("MIssissauga-Brampton South","Suburbs",46.037234042553195,30.398936170212767,16.016548463356973,3.684988179669031,3.862293144208038),
+  new oldriding("Mississauga East-Cooksville","Suburbs",45.740953390454315,33.2626681977446,16.794747224921238,2.750051526661367,1.451579660218473),
+  new oldriding("Mississauga-Erindale","Suburbs",45.0277150932235,35.698792805030344,17.019039064040488,1.868851740683128,0.385601297022545),
+  new oldriding("Mississauga South","Suburbs",50.710570198362326,36.08601508250579,10.064959307100724,2.140421613280569,0.998033798750591),
+  new oldriding("Mississauga-Streetsville","Suburbs",51.54287615403809,29.540602733649393,15.23191660428623,3.684604508026283,0),
+  new oldriding("Nepean-Carleton","East",26.970946817595436,54.481530606682774,14.766429856278503,2.981630539455276,0.799462179988008),
+  new oldriding("Newmarket-Aurora","Central",35.62151315354252,47.24470219850493,14.364153564576947,2.769631083375598,0),
+  new oldriding("Niagara Falls","Ham-Niag",35.89075055565054,34.8264660625748,26.295093178321082,1.622072149085314,1.365618054368268),
+  new oldriding("Niagara West-Glanbrook","Ham-Niag",25.984541774015458,50.95284832126937,18.54578170367644,2.805381752750174,1.711446448288554),
+  new oldriding("Nickel Belt","North",24.221442038879136,18.28554710356934,54.85989207463754,2.633118782913985,0),
+  new oldriding("Nipissing","North",28.58864924740992,50.11077083469082,18.13709519775852,3.163484720140744,0),
+  new oldriding("Northumberland-Quinte West","Central",38.34100621400111,39.800573917710935,17.731579925266832,3.061582609054687,1.065257333966432),
+  new oldriding("Oak Ridges-Markham","",44.78181310672084,37.139844307291504,13.255590360698447,2.433086251279347,2.389665974009862),
+  new oldriding("Oakville","Suburbs",48.090639259292075,37.945775926992425,10.244539937092988,1.944801311301112,1.774243565321402),
+  new oldriding("Oshawa","Suburbs",36.17618072928512,42.24850276703813,17.489197179895385,2.615419604275643,1.470699719505724),
+  new oldriding("Ottawa Centre","East",46.813565362000354,18.3267011146087,29.132268218803826,4.323810655104829,1.403654649482291),
+  new oldriding("Ottawa-Orleans","East",46.44299009816837,40.37864944116272,10.579660872891079,1.882622922952701,0.716076664825124),
+  new oldriding("Ottawa South","East",48.85588386606124,33.428769543919294,13.393875679423804,3.225445679647482,1.096025230948174),
+  new oldriding("Ottawa Vanier","East",51.51371931206512,23.44492582381515,19.60351844558225,4.513588026782197,0.924248391755284),
+  new oldriding("Ottawa West-Nepean","East",41.61865322290241,39.347767374864965,14.800144040331293,3.342185812027368,0.891249549873965),
+  new oldriding("Oxford","Southwest",24.99468763280918,54.87144071398215,15.631640458988525,3.548661283467913,0.953569910752231),
+  new oldriding("Parkdale-High Park","Toronto",37.42453209901389,11.742805393439324,46.19893338699939,3.333165626886697,1.300563493660696),
+  new oldriding("Parry Sound-Muskoka","",18.209420875233292,54.08785760049027,18.181564946098778,9.055962561631244,0.465194016546422),
+  new oldriding("Perth-Wellington","Southwest",39.52734638757596,40.094530722484805,15.76232275489534,2.479405806887238,2.136394328156651),
+  new oldriding("Peterborough","Central",39.93176867113321,31.491224464630687,25.607299930124544,2.538123227424062,0.431583706687492),
+  new oldriding("Pickering-Scarborough East","Suburbs",46.66205199200123,33.41280828590473,16.4692611393119,2.809824129621084,0.646054453161052),
+  new oldriding("Prince Edward-Hastings","East",35.24706199582051,42.280295710401546,16.580904658112935,4.604183987596342,1.28755364806867),
+  new oldriding("Renfrew-Nipissing-Pembroke","East",15.983070411696806,70.78106964217007,10.970886238296782,1.472361164550468,0.792612543285879),
+  new oldriding("Richmond Hill","Suburbs",46.9183960056171,35.79081499973995,12.968741873407188,3.297446299474697,1.024600821761065),
+  new oldriding("St Catharines","Ham-Niag",40.206113128000936,36.21267127298278,20.199086544091813,2.496779482374985,0.885349572549479),
+  new oldriding("St Paul's","Toronto",58.3910296757349,20.915215516236568,16.60722195025293,2.750775112478728,1.335757745296874),
+  new oldriding("Sarnia-Lambton","Southwest",21.775308641975307,48.32098765432099,25.44938271604938,1.4,3.054320987654321),
+  new oldriding("Sault Ste Marie","North",54.953264651702256,11.861226717609334,30.828273180050488,1.770485092447295,0.586750358190626),
+  new oldriding("Scarborough-Agincourt","Toronto",46.85378425949208,32.1284888106613,15.768795574553684,2.269298466180538,2.979632889112396),
+  new oldriding("Scarborough Centre","Toronto",51.42729705619982,23.929527207850136,21.90646106792405,1.777749458391742,0.958965209634255),
+  new oldriding("Scarborough-Guildwood","Toronto",48.933968771555776,28.648021571455445,19.420580673480906,1.294914403963128,1.702514579544742),
+  new oldriding("Scarborough-Rouge River","Toronto",41.871393239901074,18.7881286067601,35.96592470458917,1.250343500961803,2.124209947787854),
+  new oldriding("Scarborough Southwest","Toronto",44.09408350213139,21.347159657768238,31.453880339813164,2.349064304501618,0.755812195785591),
+  new oldriding("Simcoe-Grey","Central",22.307510881451147,54.33006711121593,14.663693475417569,8.69872853191535,0),
+  new oldriding("Simcoe North","Central",22.412579722894215,55.15944578843193,16.95623488014075,5.471739608533099,0),
+  new oldriding("Stormon-Dundas-South Glengarry","East",21.65842858613943,55.25435073627845,20.649263721552877,1.418494490783647,1.019462465245598),
+  new oldriding("Sudbury","North",42.3697442699818,13.57312521208008,40.7317148409785,2.68377703057038,0.64163864638924),
+  new oldriding("Thornhill","Suburbs",40.923467569493944,46.710174625801855,8.962936564504632,1.683891660727014,1.719529579472559),
+  new oldriding("Thunder Bay-Atikokan","North",38.9690332326284,21.959969788519636,37.31495468277946,1.431268882175227,0.324773413897281),
+  new oldriding("Thunder Bay-Superior North","North",45.004207788233494,17.512049575395913,34.85196235942162,2.123020426899242,0.508759850049728),
+  new oldriding("Timiskaming-Cochrane","North",25.91549295774648,21.174370164649872,50.12100773656021,1.237849633009324,1.55127950803412),
+  new oldriding("Timmins-James Bay","North",12.368024132730016,36.69467787114846,49.46778711484594,1.004093945270416,0.465416936005171),
+  new oldriding("Toronto Centre","Toronto",54.93730407523511,25.189393939393938,15.643504005572971,2.444705677464298,1.785092302333682),
+  new oldriding("Toronto-Danforth","Toronto",30.6046085926564,9.389469150425326,54.00559922472273,3.644879939700657,2.355443092494885),
+  new oldriding("Trinity-Spadina","Toronto",39.93305760457084,11.55502494350403,42.36131838144374,5.148595062465356,1.002004008016032),
+  new oldriding("Vaughan","Suburbs",53.019223367836815,31.235440678996092,11.33145623594709,1.405797395020966,3.00808232219904),
+  new oldriding("Welland","Ham-Niag",19.756192393019692,32.12954280355877,44.66070489216202,2.29856139789127,1.15499851336825),
+  new oldriding("Wellington-Halton Hills","Southwest",26.82984565855506,55.61736577975571,14.454123662531957,3.098664899157277,0),
+  new oldriding("Whitby-Oshawa","Suburbs",33.400180881601194,48.16759073571625,15.46341079784515,2.239392866973379,0.729424717864024),
+  new oldriding("Willowdale","Toronto",50.84298896829252,33.59929693101135,12.849510858252966,2.021323342352968,0.686879900090196),
+  new oldriding("Windsor-Tecumseh","Southwest",42.82989981467057,20.8186726115334,32.84359807687142,2.229325024844887,1.278504472079718),
+  new oldriding("Windsor West","Southwest",41.30943330019299,24.785075150593602,30.832212410082462,3.073279139130944,0),
+  new oldriding("York Centre","Toronto",45.35885167464115,35.51782682512734,14.134897360703812,1.651489427380768,3.336934712146936),
+  new oldriding("York-Simcoe","Central",24.539369977000803,52.78186939556038,17.07367496188335,3.82200170555857,1.783083959996899),
+  new oldriding("York South-Weston","Toronto",44.5509407170749,11.10465679155775,42.18220544099138,1.529673734146578,0.632523316229386),
+  new oldriding("York West","Toronto",50.48924541607899,12.054830747531735,34.82457686882934,1.264985895627644,1.366361071932299));
+
+var PREV = new Array(37.8209574593, 35.5497034322, 22.4662228691, 2.9195979411,1.2435182984);
+
+function numericsort(a, b) {
+  return b - a;
+}
+
+function predictedriding(oldriding, newresults) {
+  this.name = oldriding.name;
+  this.data = new Array();
+  for (var i = LIB; i <= OTH; i++) {
+    this.data[i] = oldriding.data[i] - PREV[i] + newresults[i];
+  }
+  this.oldwinner = oldriding.winner;
+  this.newwinner = this.data.indexOf(Math.max.apply(Math, this.data));
+  var sorted = this.data.slice().sort(numericsort);
+  this.margin = sorted[0] - sorted[1];
+}
+
+function calcsum() {
+  var sum = 0;
+  $.each($("#parties input"), function(index, input) {
+    sum += parseFloat(input.value);	
+  });
+  return sum;	
+}
+
+function popvote() {
+  var inputs = $("#parties input");
+  sum = calcsum();
+  if (sum < 100.0) {
+	var othval = parseFloat($("#oth").val());
+	othval += 100.0 - sum;
+	$("#oth")[0].value = othval;
+  }
+  if (sum > 100.0) {
+    $("#oth")[0].value = Math.max(0, $("#oth").val() - (sum - 100))
+  }
+  $("#predict")[0].disabled = (Math.abs(calcsum() - 100.0) > 0.1);	
+}
+
+function recalculate(lib, pc, ndp, grn, other) {
+  var newresults = new Array(lib, pc, ndp, grn, other);
+  var prediction = new Array();
+  $.each(results, function(index, value) {
+    prediction[index] = new predictedriding(value, newresults);
+  });
+  return prediction;
+}
+
+function calcTotals(prediction) {
+  var totals = new Array(0, 0, 0, 0, 0);
+  $.each(prediction, function(index, pred) {
+    totals[pred.newwinner]++;
+  });
+  return totals;
+}
+
+
+/*
+function printResult(label, index, totals) {
+  $("#" + label).html(label + ": " + totals[index]);
+}
+
+function gains(prediction, prev, curr) {
+  var list = Array();
+  var len = 0;
+  $.each(prediction, function(index, pred) {
+    if (pred.oldwinner == prev && pred.newwinner == curr) {
+      list[len++] = pred.name;
+    }
+  });
+  return list;
+}
+
+function printGains(label, title, prediction, prev, curr) {
+  var thegains = gains(prediction, prev, curr);
+  if (thegains.length == 0) {
+    $("#" + label).html("");
+    return;
+  }
+  var txt = "<br>" + title + "<br>";
+  $.each(thegains, function(index, value) {
+    txt += value + "<br>";
+  });
+  txt += "<br><br>";
+  $("#" + label).html(txt);
+}
+
+function printClose(prediction) {
+  var txt = "";
+  $.each(prediction, function(index, pred) {
+    if (pred.margin < 2) {
+      txt += pred.name + "<br>";
+    }
+  });
+  if (txt.length > 0) {
+    $("#Close").html("Close seats:<br>" + txt);
+  }
+}*/
+
+function addCell(data) {
+  return "<td>" + data + "</td>";
+}
+
+var LABELS = new Array("Liberal", "PC", "NDP", "Green", "Other");
+var COLORS = new Array("red", "blue", "orange", "green", "grey");
+
+function result(party, total) {
+  this.party = LABELS[party];
+  this.color = COLORS[party];
+  this.total = total;
+}
+
+function showSummary(totals) {
+  var results = new Array();
+  var count = 0;
+  for (var i = LIB; i < OTH; i++) {
+    if (totals[i] > 0) {
+	  results[count++] = new result(i, totals[i]);
+    }	
+  }
+  results.sort(function(a, b) { return a.total < b.total; });
+  $("#summary tbody").html("");
+  $.each(results, function(index, result) {
+	var row = "<tr><td class='party'>" + result.party + "</td><td>" + result.total + 
+	    "<span class='bar' style='background-color:" + result.color + "; width: " + result.total + "px'>&nbsp;</span></td></tr>";
+    $("#summary tbody").append(row);	
+  });
+}
+
+function printTable(prediction) {
+  $("#results tbody").html("");
+  $.each(prediction, function(index, pred) {
+    var row = "<tr>";
+    row += addCell(pred.name);
+    row += addCell(LABELS[pred.oldwinner]);
+    row += addCell(LABELS[pred.newwinner]);
+    row += "</tr>";
+    $("#results tbody").append(row);
+  });
+  $("#results").trigger("update"); 
+  $("#results").trigger("sorton",[[[0, 0], [1, 0]]]); 
+  $("#results").css("display", "block");
+}
+
+function predict() {
+  var lib = parseFloat($("#lib").val());
+  var pc = parseFloat($("#pc").val());
+  var ndp = parseFloat($("#ndp").val());
+  var grn = parseFloat($("#grn").val());
+  var oth = parseFloat($("#oth").val());
+  var prediction = recalculate(lib, pc, ndp, grn, oth);
+  var totals = calcTotals(prediction);
+ /* printResult("PC", PC, totals);
+  printResult("NDP", NDP, totals);
+  printResult("Liberal", LIB, totals);
+  printGains("LibPC", "Liberal to PC", prediction, LIB, PC);
+  printGains("LibNDP", "Liberal to NDP", prediction, LIB, NDP);
+  printGains("PCNDP", "PC to NDP", prediction, PC, NDP);
+  printGains("PCLib", "PC to Liberal", prediction, PC, LIB);
+  printGains("NDPPC", "NDP to PC", prediction, NDP, PC);
+  printGains("NDPLib", "NDP to Liberal", prediction, NDP, LIB);
+  printClose(prediction);*/
+  showSummary(totals);
+  printTable(prediction);
+}
+
+$(document).ready(function() {
+  $("#results").tablesorter();
+});
+</script>
+</head>
+<body>
+<h1 align="center">Predict the Next Ontario Election!</h1>
+<p>There is a strong possibility that there will be a general election in Ontario next year. This site lets you predict seat-by-seat results of the next election. Using the Uniform Swing model, we make rough predictions to which seats will change party hands.<p>
+<p>Enter below the percentage of the popular vote you think each party will win in the next election. Initial values are those of the most recent published poll. If your total adds up to less than 100, the balance will be allocated to "Other".</p>
+<table id="parties">
+<tr><td class="party">PC: </td><td class="percent"><input type="number" min="0" max="100" id="pc" value="35" onchange="popvote()"></td></tr>
+<tr><td class="party">Liberal: </td><td class="percent"><input type="number" min="0" max="100" id="lib" value="29" onchange="popvote()"></td></tr>
+<tr><td class="party">NDP:</td><td class="percent"><input type="number" min="0" max="100" id="ndp" value="27" onchange="popvote()"></td></tr>
+<tr><td class="party">Green: </td><td class="percent"><input type="number" min="0" max="100" id="grn" value="8" onchange="popvote()"></td></tr>
+<tr><td class="party">Other: </td><td class="percent"><input type="number" min="0" max="100" id="oth" value="1" disabled="1"></td></tr>
+</table>
+<button id="predict" onclick="predict()">Predict</button>
+<table id="summary">
+<tbody>
+</tbody>
+</table>
+<!--<div id="PC"></div>
+<div id="NDP"></div>
+<div id="Liberal"></div>
+<div id="LibPC"></div>
+<div id="LibNDP"></div>
+<div id="PCNDP"></div>
+<div id="PCLib"></div>
+<div id="NDPPC"></div>
+<div id="NDPLib"></div>
+<div id="Close"></div>-->
+<table id="results">
+  <thead>
+    <th>Riding</th>
+    <th>Winner 2011</th>
+    <th>Winner 2013</th>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+</body>
+</html>
