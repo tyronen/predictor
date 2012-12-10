@@ -217,49 +217,6 @@ function calcTotals(prediction) {
   return totals;
 }
 
-
-/*
-function printResult(label, index, totals) {
-  $("#" + label).html(label + ": " + totals[index]);
-}
-
-function gains(prediction, prev, curr) {
-  var list = Array();
-  var len = 0;
-  $.each(prediction, function(index, pred) {
-    if (pred.oldwinner == prev && pred.newwinner == curr) {
-      list[len++] = pred.name;
-    }
-  });
-  return list;
-}
-
-function printGains(label, title, prediction, prev, curr) {
-  var thegains = gains(prediction, prev, curr);
-  if (thegains.length == 0) {
-    $("#" + label).html("");
-    return;
-  }
-  var txt = "<br>" + title + "<br>";
-  $.each(thegains, function(index, value) {
-    txt += value + "<br>";
-  });
-  txt += "<br><br>";
-  $("#" + label).html(txt);
-}
-
-function printClose(prediction) {
-  var txt = "";
-  $.each(prediction, function(index, pred) {
-    if (pred.margin < 2) {
-      txt += pred.name + "<br>";
-    }
-  });
-  if (txt.length > 0) {
-    $("#Close").html("Close seats:<br>" + txt);
-  }
-}*/
-
 function addCell(data) {
   return "<td>" + data + "</td>";
 }
@@ -285,7 +242,7 @@ function showSummary(totals) {
   $("#summary tbody").html("");
   $.each(results, function(index, result) {
 	var row = "<tr><td class='party'>" + result.party + "</td><td>" + result.total + 
-	    "<span class='bar' style='background-color:" + result.color + "; width: " + result.total + "px'>&nbsp;</span></td></tr>";
+	    "<span class='bar' style='background-color:" + result.color + "; width: " + 6 * result.total + "px'>&nbsp;</span></td></tr>";
     $("#summary tbody").append(row);	
   });
 }
@@ -348,16 +305,6 @@ $(document).ready(function() {
 <tbody>
 </tbody>
 </table>
-<!--<div id="PC"></div>
-<div id="NDP"></div>
-<div id="Liberal"></div>
-<div id="LibPC"></div>
-<div id="LibNDP"></div>
-<div id="PCNDP"></div>
-<div id="PCLib"></div>
-<div id="NDPPC"></div>
-<div id="NDPLib"></div>
-<div id="Close"></div>-->
 <table id="results">
   <thead>
     <th>Riding</th>
