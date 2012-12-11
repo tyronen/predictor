@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
 <style type="text/css">
 body {
   font-family: "Arial";
@@ -48,7 +49,8 @@ function oldriding(name, region, lib, pc, ndp, grn, oth) {
   this.data[NDP] = ndp;
   this.data[GRN] = grn;
   this.data[OTH] = oth;
-  this.winner = this.data.indexOf(Math.max.apply(Math, this.data));
+  var biggest = Math.max.apply(Math, this.data);
+  this.winner = $.inArray(biggest, this.data);
 }
 
 var results = Array(
@@ -173,7 +175,7 @@ function predictedriding(oldriding, newresults) {
     this.data[i] = oldriding.data[i] - PREV[i] + newresults[i];
   }
   this.oldwinner = oldriding.winner;
-  this.newwinner = this.data.indexOf(Math.max.apply(Math, this.data));
+  this.newwinner = $.inArray(Math.max.apply(Math, this.data), this.data);
   var sorted = this.data.slice().sort(numericsort);
   this.margin = sorted[0] - sorted[1];
 }
@@ -238,7 +240,7 @@ function showSummary(totals) {
 	  results[count++] = new result(i, totals[i]);
     }	
   }
-  results.sort(function(a, b) { return a.total < b.total; });
+  results.sort(function(a, b) { return b.total - a.total; });
   $("#summary tbody").html("");
   $.each(results, function(index, result) {
 	var row = "<tr><td class='party'>" + result.party + "</td><td>" + result.total + 
@@ -270,16 +272,6 @@ function predict() {
   var oth = parseFloat($("#oth").val());
   var prediction = recalculate(lib, pc, ndp, grn, oth);
   var totals = calcTotals(prediction);
- /* printResult("PC", PC, totals);
-  printResult("NDP", NDP, totals);
-  printResult("Liberal", LIB, totals);
-  printGains("LibPC", "Liberal to PC", prediction, LIB, PC);
-  printGains("LibNDP", "Liberal to NDP", prediction, LIB, NDP);
-  printGains("PCNDP", "PC to NDP", prediction, PC, NDP);
-  printGains("PCLib", "PC to Liberal", prediction, PC, LIB);
-  printGains("NDPPC", "NDP to PC", prediction, NDP, PC);
-  printGains("NDPLib", "NDP to Liberal", prediction, NDP, LIB);
-  printClose(prediction);*/
   showSummary(totals);
   printTable(prediction);
 }
